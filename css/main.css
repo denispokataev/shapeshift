@@ -1,0 +1,26 @@
+.board {
+	padding-left: 0.2em;
+	text-align: center;
+	width: 100%;
+}
+.tileGrid { }
+.tileRow {
+	width: 100%;
+}
+.tileBox {
+	max-width: 50px;
+	display: inline-block;
+	margin: 3px
+}
+.tile { 
+	max-width: 50px;
+}
+.tileSelected {
+	border-width: 3px;
+	margin: 1px;
+}
+.message {
+	font-size: 4em;
+	display: inline-block;
+	padding-bottom: 0.3em
+}
