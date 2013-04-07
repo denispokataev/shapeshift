@@ -1,45 +1,39 @@
 <!DOCTYPE html>
-<html ng-app lang="en" ng-init="baseurl = '/shapeshift-angular/'">
+<html ng-app="ssGameApp" lang="en">
 <head>
     <meta charset="utf-8">
-		<title>Shapeshift puzzle game</title>
+	<title>Shapeshift puzzle game</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Puzzle game">
-		<meta name="author" content="Denis Pokataev">
-		<!-- XXX: Full path must be used -->
-		<script src="/shapeshift-angular/js/angular.min.js"></script>
+	<meta name="author" content="Denis Pokataev">
+	<!-- XXX: Full path must be used -->
+	<script src="/shapeshift-angular/js/angular.min.js"></script>
 
-		<link href="{{baseurl}}css/bootstrap.min.css" rel="stylesheet">
-    <style>
-      body {
-				padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-      }
-    </style>
-		<link href="{{baseurl}}css/bootstrap-responsive.min.css" rel="stylesheet">
-		<link href="{{baseurl}}css/main.css" rel="stylesheet">
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<style>
+		body {
+			padding-top: 60px;  /* 60px to make the container go all the way to the bottom of the topbar */
+		}
+	</style>
+	<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+	<link href="css/main.css" rel="stylesheet">
 
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
-		<link rel="shortcut icon" href="{{baseurl}}img/favicon.png">
-		<link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{baseurl}}img/apple-touch-icon-114-precomposed.png">
-		<link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{baseurl}}img/apple-touch-icon-72-precomposed.png">
-		<link rel="apple-touch-icon-precomposed" href="{{baseurl}}img/apple-touch-icon-57-precomposed.png">
-
-	<style type="text/css">
-		.tile1 { background-color: red }
-		.tile2 { background-color: blue }
-	</style>
 </head>
 <body>
-	<div ng-init="tiles = [[1,1],[1,2],[2,1],[2,2]]">
-		<!-- <span ng-repeat="tile in tiles" ng-class="{tile1: tile.0==1,tile2: tile.0==2}"> {{tile.0}}</span> -->
-		<span ng-repeat="tile in tiles" class="tile{{tile.0}}"> {{tile.0}}</span>
+	<div class="board" ng-controller="ssBoardCtrl" ng-init="startGame()">
+		<div class="message" ng-bind="text"></div>
+		<div class="tileGrid">
+			<div class="tileRow" ng-repeat="row in tiles">
+				<div class="btn tileBox {{colors[tile.c]}}" ng-class="{tileSelected: selectedIndex == tile.y*5+tile.x}" ng-repeat="tile in row" ng-click="tileClick(tile)" ng-disabled="won">
+					<i ng-class="icons[tile.s]" class="tile"></i>
+				</div>
+			</div>
+		</div>
 	</div>
 
-
-	<script src="{{baseurl}}js/bootstrap.min.js"></script>
-	<script src="{{baseurl}}js/main.js"></script>
+	<script src="js/main.js"></script>
 </body>
 </html>
