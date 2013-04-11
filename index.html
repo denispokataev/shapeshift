@@ -6,15 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Puzzle game">
 	<meta name="author" content="Denis Pokataev">
-	<!-- XXX: Full path must be used -->
-	<script src="/shapeshift-angular/js/angular.min.js"></script>
+	<script src="js/angular.min.js"></script>
 
 	<link href="css/bootstrap.min.css" rel="stylesheet">
-	<style>
-		body {
-			padding-top: 60px;  /* 60px to make the container go all the way to the bottom of the topbar */
-		}
-	</style>
 	<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
 	<link href="css/main.css" rel="stylesheet">
 
@@ -24,13 +18,19 @@
 </head>
 <body>
 	<div class="board" ng-controller="ssBoardCtrl" ng-init="startGame()">
-		<div class="message" ng-bind="text"></div>
 		<div class="tileGrid">
 			<div class="tileRow" ng-repeat="row in tiles">
 				<div class="btn tileBox {{colors[tile.c]}}" ng-class="{tileSelected: selectedIndex == tile.y*5+tile.x}" ng-repeat="tile in row" ng-click="tileClick(tile)" ng-disabled="won">
 					<i ng-class="icons[tile.s]" class="tile"></i>
 				</div>
 			</div>
+		</div>
+		<div class="message"><p>The goal of the game is to place all tiles of same
+			color in rows and tiles with same icon in rows also. You decide what rows
+			- horizontal or vertical will hold same what - icons or colors.</p>
+			<p>You can swap tiles if they are one tile away from each other -
+				horizontally, vertically or diagonally - and have same color or same
+				icon.</p>
 		</div>
 	</div>
 
