@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html ng-app="App1" lang="en">
+<head>
+  <meta charset="utf-8">
+	<title>Shapeshift puzzle game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Puzzle game">
+	<meta name="author" content="Denis Pokataev">
+	<script src="js/angular.min.js"></script>
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+	<style type="text/css">
+	  .board {
+			padding-top: 0.4em;
+			padding-left: 0.2em;
+			text-align: center;
+		}
+		.tileBox, .tileBox:hover {
+			width: 14px;
+			height: 18px;
+			display: block;
+			margin: 5px;
+			position: absolute;
+			left: 0px;
+			top: 0px;
+			-moz-transition: left .5s, top .5s, background-position 0.1s linear 0s;
+			-webkit-transition: left .5s, top .5s, background-position 0.1s linear 0s;
+			-o-transition: left .5s, top .5s, background-position 0.1s linear 0s;
+			transition: left .5s, top .5s, background-position 0.1s linear 0s;
+		}
+		.tileBox.selected {
+			margin: 3px;
+			border-width: 3px;
+		}
+		.tileGrid {
+			display: block;
+			position: relative;
+			margin: 0 auto;
+			width: 230px;
+			height: 190px;
+		}
+		.wonMsg {
+			display: block;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			width: 230px;
+			height: 190px;
+			margin: 1em auto;
+			padding-top: 60px;
+			font-size: 3.2em;
+		}
+		.message {
+			font-size: 1em;
+			display: inline-block;
+			padding-top: 0.5em;
+			padding-bottom: 0.3em;
+		}
+	</style>
+	<script>
+		function Ctrl1($scope) {
+			var tiles = [];
+			for (var i = 0; i < 5; i ++) {
+				for (var j = 0; j < 5; j++) {
+					tiles.push( {x: j, y: i, c: i, s: j} );
+				}
+			}
+			for (var i = 0; i < 25; i++ ) {
+				var i2 = 5*Math.floor(5*Math.random()) + Math.floor(5*Math.random());
+				var tmp = tiles[i].x;
+				tiles[i].x = tiles[i2].x;
+				tiles[i2].x = tmp;
+				tmp = tiles[i].y;
+				tiles[i].y = tiles[i2].y;
+				tiles[i2].y = tmp;
+			}
+			$scope.tiles = tiles;
+			$scope.won = 0;
+			$scope.colors = ['btn-danger','btn-success','btn-primary','btn-info','btn-warning'];
+			$scope.icons = ['icon-glass','icon-heart','icon-plane','icon-cog','icon-book'];
+			$scope.checkWin = function(){
+				var nok1 = 0, nok2 = 0;
+				for (var i = 0; i < $scope.tiles.length; i++) {
+					if (!nok1 && ( ((i+1)%5 != 0 && $scope.tiles[i].x != $scope.tiles[i+1].x)
+						|| (i < 20 && $scope.tiles[i].y != $scope.tiles[i+5].y))) {
+						nok1 = 1;
+					}
+					if (!nok2 && ( ((i+1)%5 != 0 && $scope.tiles[i].y != $scope.tiles[i+1].y)
+						|| (i < 20 && $scope.tiles[i].x != $scope.tiles[i+5].x))) {
+						nok2 = 1;
+					}
+					if (nok1 && nok2) { return 0; }
+				};
+				if (nok1 && nok2) { return 0; }
+				$scope.won = 1;
+			};
+		}
+		angular.module('App1',[])
+			.directive('tile', function(){
+				function reDraw(el,val,old,animate) {
+					var left = Math.floor(val/5),
+							left1 = left,
+							top = Math.floor(val%5),
+							top1 = top;
+					if (animate == 0) {
+						el[0].style.left = left * 46 + 'px';
+						el[0].style.top = top * 38 + 'px';
+						return;
+					}
+					if (left < Math.floor(old/5)) {
+						left1 += 0.5;
+						top1 -= 0.5;
+					}
+					else if (left > Math.floor(old/5)) {
+						left1 -= 0.5;
+						top1 += 0.5;
+					}
+					if (top < Math.floor(old%5)) {
+						left1 += 0.5;
+						top1 += 0.5;
+					}
+					else if (top > Math.floor(old%5)) {
+						left1 -= 0.5;
+						top1 -= 0.5;
+					}
+					setTimeout(function(){
+						el[0].style.left = left1 * 46 + 'px';
+						el[0].style.top = top1 * 38 + 'px';
+					}, 1+10*Math.random());
+					setTimeout(function(){
+						el[0].style.left = left * 46 + 'px';
+						el[0].style.top = top * 38 + 'px';
+					}, 511);
+
+				}
+
+				var obj = {
+					template: '<i> &nbsp;</i>',
+					replace: false,
+					compile: function(El,At,transclude) {
+						return {
+							post: function(scope, iEl, iAt, ctrl) {
+								scope.tile = scope.$parent.tiles[scope.$index];
+								iEl.addClass(scope.$parent.colors[scope.tile.c]);
+								angular.element(iEl.children()[0]).addClass(scope.$parent.icons[scope.tile.s]);
+								scope.$watch('tile.x * 5 + tile.y', function(val,old) {
+									if (val == old) { return; }
+									reDraw(iEl, val, old, 1);
+								});
+								scope.$watch('tile.selected', function(val,old) {
+									if (val == old) { return; }
+									if (val) { iEl.addClass('selected') }
+									else { iEl.removeClass('selected') }
+								});
+								reDraw(iEl,scope.tile.x*5+scope.tile.y, 0, 0);
+								iEl.bind('click', function() { scope.$apply( function() {
+										if (scope.$parent.won) { return; }
+										if (scope.$parent.selected == undefined) {
+											scope.$parent.selected = scope.tile;
+											scope.tile.selected = 1;
+										}
+										else {
+											if (scope.$parent.selected.x == scope.tile.x && scope.$parent.selected.y == scope.tile.y) {
+												// remove selection
+												scope.$parent.selected.selected = 0;
+												scope.$parent.selected = undefined;
+											}
+											else if (Math.abs(scope.$parent.selected.x - scope.tile.x) <= 1 && Math.abs(scope.$parent.selected.y - scope.tile.y) <= 1
+												&& (scope.$parent.selected.c == scope.tile.c || scope.$parent.selected.s == scope.tile.s)
+												) {
+												// switch tiles
+												var tmp = scope.tile.x; scope.tile.x = scope.$parent.selected.x; scope.$parent.selected.x = tmp;
+												tmp = scope.tile.y; scope.tile.y = scope.$parent.selected.y; scope.$parent.selected.y = tmp;
+												// remove selection
+												scope.$parent.selected.selected = 0;
+												scope.$parent.selected = undefined;
+												// check game done
+												scope.$parent.checkWin();
+											}
+										}
+										} );
+									}
+								);
+							}
+						};
+					}
+				};
+
+				return obj;
+			});
+	</script>
+</head>
+<body ng-controller="Ctrl1">
+	<div class="board">
+		<div class="tileGrid">
+			<div x-tile="{{tileData}}" class="btn tileBox" x-ng-repeat="tileData in tiles" x-ng-disabled="won"></div>
+			<div class="wonMsg" x-ng-show="won">You won!</div>
+		</div>
+		<div class="message"><p>The goal of the game is to place all tiles of same
+			color in rows and tiles with same icon in rows also. You decide what rows
+			- horizontal or vertical will hold same what - icons or colors.</p>
+			<p>You can swap tiles if they are one tile away from each other -
+				horizontally, vertically or diagonally - and have same color or same
+				icon.</p>
+		</div>
+	</div>
+</body>
+</html>
